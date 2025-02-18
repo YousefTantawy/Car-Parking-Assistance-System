@@ -1,0 +1,54 @@
+/*------------------------------------------------------------------------------
+ *  Module      : Ultrasonic Driver
+ *  File        : ultrasonic.c
+ *  Description : Source file for the Ultrasonic
+ *  Author      : Yousef Tantawy
+ *----------------------------------------------------------------------------*/
+
+#include "ultrasonic.h"
+#include "icu.h"
+#include "gpio.h"
+#include "std_types.h"
+
+uint16 g_timeHigh = 0;
+ICU_ConfigType ICU_Configurations = {F_CPU_8,RISING};
+uint32 g_tick = 0;
+
+void Ultrasonic_init(void)
+{
+	ICU_init(&ICU_Configurations);
+
+	setupPinDirection(ULTRASONIC_PORT_ID, ULTRASONIC_TRIGGER_PIN_ID, PIN_OUTPUT);
+	setupPinDirection(ULTRASONIC_PORT_ID, ULTRASONIC_ECHO_PIN_ID, PIN_INPUT);
+
+	ICU_setCallBack(Ultrasonic_edgeProcessing);
+}
+
+void Ultrasonic_Trigger(void)
+{
+	GPIO_writePin(ULTRASONIC_PORT_ID, ULTRASONIC_TRIGGER_PIN_ID, LOGIC_HIGH);
+	_delay_us(10);
+	GPIO_writePin(ULTRASONIC_PORT_ID, ULTRASONIC_TRIGGER_PIN_ID, LOGIC_LOW);
+}
+
+uint16 Ultrasonic_readDistance(void)
+{
+
+}
+
+void Ultrasonic_edgeProcessing(void)
+{
+	g_tick++;
+
+	if(g_tick == 1)
+	{
+		ICU_clearTimerValue();
+		ICU_setEdgeDetectionType(FALLING);
+	}
+
+	if(g_tick == 2)
+	{
+		g_timeHigh = ICU_getInputCaptureValue();
+		ICU_setEdgeDetectionType(RISING);
+	}
+}

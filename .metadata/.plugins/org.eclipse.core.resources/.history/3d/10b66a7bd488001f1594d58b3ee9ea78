@@ -1,0 +1,35 @@
+/*------------------------------------------------------------------------------
+ *  Module      : Ultrasonic Driver
+ *  File        : ultrasonic.c
+ *  Description : Source file for the Ultrasonic
+ *  Author      : Yousef Tantawy
+ *----------------------------------------------------------------------------*/
+
+#include "ultrasonic.h"
+#include "icu.h"
+#include "gpio.h"
+#include "std_types.h"
+
+void Ultrasonic_init(void)
+{
+
+	ICU_init();
+
+	setupPinDirection(ULTRASONIC_PORT_ID, ULTRASONIC_TRIGGER_PIN_ID, PIN_OUTPUT);
+	setupPinDirection(ULTRASONIC_PORT_ID, ULTRASONIC_ECHO_PIN_ID, PIN_OUTPUT);
+
+	ICU_setCallBack(Ultrasonic_edgeProcessing);
+}
+
+void Ultrasonic_Trigger(void)
+{
+	GPIO_writePin(ULTRASONIC_PORT_ID, ULTRASONIC_TRIGGER_PIN_ID, LOGIC_HIGH);
+}
+
+uint16 Ultrasonic_readDistance(void)
+{
+	Ultrasonic_Trigger();
+
+}
+
+void Ultrasonic_edgeProcessing(void);
